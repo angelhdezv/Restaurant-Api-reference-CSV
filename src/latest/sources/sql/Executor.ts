@@ -17,7 +17,8 @@ import * as mysql from "mysql";
         user: process.env.SQL_USER,
         password: process.env.SQL_PASSWORD,
         database: process.env.SQL_DATABASE,
-        multipleStatements: true
+        multipleStatements: true,
+        insecureAuth:true
       });
     }
   
