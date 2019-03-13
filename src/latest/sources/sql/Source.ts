@@ -9,6 +9,7 @@ import * as Mapper from "@lt/sources/api/Mappers";
 
 class Source extends Executor implements Repository
 {
+  
   async getDishList(fs: { restaurantId?:number }): Promise<Dish[]> //CHECK ARGS TYPES
   {
     const query =
@@ -21,6 +22,18 @@ class Source extends Executor implements Repository
     //TODO CHECK FETCH
     return res; 
   }
+  async getRestaurantList(fs: { restaurantId?:number }): Promise<Restaurant[]> //CHECK ARGS TYPES
+  {
+    const query =
+      "SELECT r.* FROM restaurant r";
+    const filter: Pair[] = [];
+    
+    if (fs.restaurantId) filter.push(new Pair("d.restaurant_id", fs.restaurantId));
+    
+    const res = await this.get(query, filter, new Mapper.RestaurantMapper());
+    //TODO CHECK FETCH
+    return this.fetchRestaurant(res); 
+  }
 
 
 
@@ -31,7 +44,7 @@ class Source extends Executor implements Repository
     const params = [restaurantId];
     const res = await this.getDetails(query, params, new Mapper.RestaurantMapper());
     //TODO CHECK FETCH
-    return this.fetchRestaurant(res)[0];
+    return res[0];
   }
 
   async getDishDetails(dishId: number): Promise<Dish>

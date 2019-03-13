@@ -18,7 +18,7 @@ class Routes
 
   init(): Router
   {
-    this.router.get("/restaurants/:id", (req, res) => this.restaurants.getDetails(req, res));
+    this.router.get("/restaurants/:id", (req, res) => this.restaurants.getList(req, res));
     this.router.post("/restaurants", (req, res) => this.restaurants.save(req, res));
     this.router.put("/restaurants/:id", (req, res) => this.restaurants.update(req, res));
     this.router.delete("/restaurants/:id", (req, res) => this.restaurants.delete(req, res));

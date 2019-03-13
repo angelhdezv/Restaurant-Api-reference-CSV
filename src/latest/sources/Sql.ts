@@ -1,10 +1,12 @@
 import Restaurant from "@lt/models/Restaurant";
 import Dish from "@lt/models/Dish";
+import Restaurants from "@lt/controllers/Restaurants";
 
 interface Sql
 {
  
   getDishList(fs: { restaurantId?:number }): Promise<Dish[]>; //CHECK ARGS TYPES
+  getRestaurantList(fs: { restaurantId?:number }): Promise<Restaurant[]>; //CHECK ARGS TYPES
 
   getRestaurantDetails(restaurantId: number): Promise<Restaurant>;
   getDishDetails(dishId: number): Promise<Dish>;

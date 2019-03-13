@@ -14,6 +14,17 @@ class Restaurants
   {
     this.sql = p.sql;
   }
+  async getList(req: Request, res: Response)
+  {
+    const { restaurant_id } = req.query;
+    
+    
+    const result = await this.sql.getRestaurantList({
+      restaurantId: restaurant_id
+    });
+    
+    return Res.sendList(res, result);
+  }
 
   async getDetails(req: Request, res: Response)
   {
