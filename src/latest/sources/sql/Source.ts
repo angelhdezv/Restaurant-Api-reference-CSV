@@ -5,20 +5,18 @@ import Dish from "@lt/models/Dish";
 
 import Generator from "@util/Generator";
 import Executor from "@lt/sources/sql/Executor";
-import * as Mapper from "@lt/sources/sql/Mappers";
+import * as Mapper from "@lt/sources/api/Mappers";
 
 class Source extends Executor implements Repository
 {
-  async getDishList(fs: {}): Promise<Dish[]>
-  //(Suggestion) -> async getDishList(fs: { restaurantId? }): Promise<Dish[]> //CHECK ARGS TYPES
+  async getDishList(fs: { restaurantId?:number }): Promise<Dish[]> //CHECK ARGS TYPES
   {
     const query =
-      `SELECT d.* FROM dish d`;
+      "SELECT d.* FROM dish d";
     const filter: Pair[] = [];
-    //TODO ADD FILTERS
-    /* (Suggestion)
+    
     if (fs.restaurantId) filter.push(new Pair("d.restaurant_id", fs.restaurantId));
-    */
+    
     const res = await this.get(query, filter, new Mapper.DishMapper());
     //TODO CHECK FETCH
     return res; 
@@ -33,7 +31,7 @@ class Source extends Executor implements Repository
     const params = [restaurantId];
     const res = await this.getDetails(query, params, new Mapper.RestaurantMapper());
     //TODO CHECK FETCH
-    return res[0];
+    return this.fetchRestaurant(res)[0];
   }
 
   async getDishDetails(dishId: number): Promise<Dish>
@@ -45,63 +43,74 @@ class Source extends Executor implements Repository
     //TODO CHECK FETCH
     return res[0];
   }
+  async fetchRestaurant(restaurants: Restaurant[]): Promise<Restaurant[]> {
+    const cQuery = "SELECT d.dish_id FROM dish d WHERE d.restaurant_id = ?";
+    for (let restaurant of restaurants) {
+      let dishes = [];
+      let cDish = await this.getAny(cQuery, [restaurant.id]);
+      for (let dish of cDish) {
+        dishes.push(await this.getDishDetails(dish))
+      }
+      Object.assign(restaurant,
+        {
+          dishes: dishes
+        });
+    }
+    return restaurants;
+  }
+  
 
 
 
-  async saveRestaurant(args: {}): Promise<Restaurant>
-  //(Suggestion) -> async saveRestaurant(args: { namelocation }): Promise<Restaurant> //CHECK ARGS TYPES
+async saveRestaurant(args: { name:string, location:string }): Promise<Restaurant> //CHECK ARGS TYPES
   {
     const restaurantId = Generator.getId();
     const query = "INSERT INTO restaurant";
     const attrs: Pair[] = [];
     attrs.push(new Pair("restaurant_id", restaurantId));
-    //TODO ADD COLUMNS
-    /* (Suggestion)
-    attrs.push(new Pair("namelocation", args.namelocation));
-    */
+    attrs.push(new Pair("name", args.name));
+    attrs.push(new Pair("location", args.location));
     await this.save(query, attrs);
     return this.getRestaurantDetails(restaurantId);
   }
 
-  async saveDish(args: {}): Promise<Dish>
-  //(Suggestion) -> async saveDish(args: { namepricerestaurantId }): Promise<Dish> //CHECK ARGS TYPES
+ async saveDish(args: { name:string, price:number ,restaurantId: number }): Promise<Dish> //CHECK ARGS TYPES
   {
     const dishId = Generator.getId();
     const query = "INSERT INTO dish";
     const attrs: Pair[] = [];
     attrs.push(new Pair("dish_id", dishId));
-    //TODO ADD COLUMNS
-    /* (Suggestion)
-    attrs.push(new Pair("namepricerestaurant_id", args.namepricerestaurantId));
-    */
+    attrs.push(new Pair("name", args.name));
+    attrs.push(new Pair("price", args.price));
+    attrs.push(new Pair("restaurant_id", args.restaurantId));
+    
     await this.save(query, attrs);
     return this.getDishDetails(dishId);
   }
 
 
 
-  async setRestaurant(restaurantId: number, args: {}): Promise<Restaurant>
-  //(Suggestion) -> async setRestaurant(restaurantId: number, args: { namelocation? }): Promise<Restaurant> //CHECK ARGS TYPES
+  async setRestaurant(restaurantId: number, args: { name?,location? }): Promise<Restaurant> //CHECK ARGS TYPES
   {
     const query = "UPDATE restaurant";
     const columns: Pair[] = [];
-    //TODO ADD COLUMNS
-    /* (Suggestion)
-    if (args.namelocation) columns.push(new Pair("namelocation", args.namelocation));
-    */
+    
+    if (args.name) columns.push(new Pair("name", args.name));
+    if (args.location) columns.push(new Pair("location", args.location));
     await this.set(query, columns, "restaurant_id", restaurantId);
     return this.getRestaurantDetails(restaurantId);
   }
 
-  async setDish(dishId: number, args: {}): Promise<Dish>
-  //(Suggestion) -> async setDish(dishId: number, args: { namepricerestaurantId? }): Promise<Dish> //CHECK ARGS TYPES
+  async setDish(dishId: number, args: { name?, price?, restaurantId? }): Promise<Dish> //CHECK ARGS TYPES
   {
     const query = "UPDATE dish";
     const columns: Pair[] = [];
     //TODO ADD COLUMNS
-    /* (Suggestion)
-    if (args.namepricerestaurantId) columns.push(new Pair("namepricerestaurant_id", args.namepricerestaurantId));
-    */
+    
+    if (args.name) columns.push(new Pair("name", args.name));
+    if (args.price) columns.push(new Pair("price", args.price));
+    if (args.restaurantId) columns.push(new Pair("restaurantId", args.restaurantId));
+
     await this.set(query, columns, "dish_id", dishId);
     return this.getDishDetails(dishId);
   }
@@ -110,17 +119,15 @@ class Source extends Executor implements Repository
 
   async deleteRestaurant(restaurantId: number): Promise<void>
   {
-    const query = `
-      DELETE FROM restaurant WHERE restaurant_id = ?;`
+    const query ="UPDATE Dish SET restaurant_id=null WHERE restaurant_id = ?;" + `DELETE FROM restaurant WHERE restaurant_id = ?;`
     //TODO CHECK EXTRA DELETES
-    const params = [restaurantId];
+    const params = [restaurantId,restaurantId];
     return this.delete(query, params);
   }
 
   async deleteDish(dishId: number): Promise<void>
   {
-    const query = `
-      DELETE FROM dish WHERE dish_id = ?;`
+    const query = `DELETE FROM dish WHERE dish_id = ?;`
     //TODO CHECK EXTRA DELETES
     const params = [dishId];
     return this.delete(query, params);

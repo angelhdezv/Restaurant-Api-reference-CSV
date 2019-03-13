@@ -24,26 +24,25 @@ class Restaurants
 
   async save(req: Request, res: Response)
   {
-    const { namelocation } = req.body;
-    const result = await this.sql.saveRestaurant({}); // TODO CHECK ARGS
-    /* (suggestion)
+    const { name,location } = req.body;
+    
+    
     const result = await this.sql.saveRestaurant({
-      namelocation: namelocation
+      name: name, location: location
     });
-    */
+    
     return Res.sendModel(res, result);
   }
 
   async update(req: Request, res: Response)
   {
     const id = req.params.id;
-    const { namelocation } = req.body;
-    const result = await this.sql.setRestaurant(id, {}) //TODO CHECK ARGS
-    /* (suggestion)
+    const { name, location } = req.body;
+   
     const result = await this.sql.setRestaurant(id, {
-      namelocation: namelocation
+      name: name, location: location
     });
-    */
+    
     return Res.sendModel(res, result);
   }
 

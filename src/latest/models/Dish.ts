@@ -9,6 +9,7 @@ class Dish implements Model
 
   constructor(id: number)
   {
+    
     this.id = id;
   }
 

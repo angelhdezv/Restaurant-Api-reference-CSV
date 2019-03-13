@@ -18,37 +18,36 @@ class Dishes
   async getList(req: Request, res: Response)
   {
     const { restaurant_id } = req.query;
-    const result = await this.sql.getDishList({}); // TODO CHECK FILTERS
-    /* (suggestion)
+    
+    
     const result = await this.sql.getDishList({
       restaurantId: restaurant_id
     });
-    */
+    
     return Res.sendList(res, result);
   }
 
   async save(req: Request, res: Response)
   {
-    const { namepricerestaurant_id } = req.body;
-    const result = await this.sql.saveDish({}); // TODO CHECK ARGS
-    /* (suggestion)
+    const { name, price, restaurant_id } = req.body;
+   
+    
     const result = await this.sql.saveDish({
-      namepricerestaurantId: namepricerestaurant_id
+      name: name, price: price, restaurantId: restaurant_id
     });
-    */
+    
     return Res.sendModel(res, result);
   }
 
   async update(req: Request, res: Response)
   {
     const id = req.params.id;
-    const { namepricerestaurant_id } = req.body;
-    const result = await this.sql.setDish(id, {}) //TODO CHECK ARGS
-    /* (suggestion)
+    const { name, price, restaurant_id } = req.body;
+   
     const result = await this.sql.setDish(id, {
-      namepricerestaurantId: namepricerestaurant_id
+      name: name, price: price, restaurantId: restaurant_id
     });
-    */
+    
     return Res.sendModel(res, result);
   }
 

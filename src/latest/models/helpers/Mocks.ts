@@ -1,7 +1,7 @@
 import Generator from "@util/Generator";
 import Restaurant from "@lt/models/Restaurant";
 import Dish from "@lt/models/Dish";
-import  from "@lt/models/";
+
 
 class Mocks
 {
@@ -33,14 +33,5 @@ class Mocks
     ];
   }
 
-  static ()
-  {
-    return [
-      new (940030).build({  }),
-      new (6677458).build({  }),
-      new (1905905).build({  }),
-      new (7663695).build({  })
-    ];
-  }
 }
 export default Mocks;
