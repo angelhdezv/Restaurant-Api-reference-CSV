@@ -1,34 +1,26 @@
-import Match from "@lt/models/Match";
-import Player from "@lt/models/Player";
-import Score from "@lt/models/Score";
-import Team from "@lt/models/Team";
-import User from "@lt/models/User";
-import { MType } from "@lt/models/helpers/Const";
+import Restaurant from "@lt/models/Restaurant";
+import Dish from "@lt/models/Dish";
 
 interface Sql
 {
-  getMatchList(fs: { teamId?: number }): Promise<Match[]>;
-  getPlayerList(fs: { teamId?: number }): Promise<Player[]>;
-  getTeamList(fs: { userId?: number }): Promise<Team[]>;
+  getDishList(fs: {}): Promise<Dish[]>; //TODO CHECK FILTERS
+  //(Suggestion) -> getDishList(fs: { restaurantId? }): Promise<Dish[]>; //CHECK ARGS TYPES
 
-  getMatchDetails(matchId: number): Promise<Match>;
-  getPlayerDetails(playerId: number): Promise<Player>;
-  getScoreDetails(scoreId: number): Promise<Score>;
-  getTeamDetails(teamId: number): Promise<Team>;
-  getUserAuth(email: string, password: string): Promise<User>;
-  getUserDetails(userId: number): Promise<User>;
+  getRestaurantDetails(restaurantId: number): Promise<Restaurant>;
+  getDishDetails(dishId: number): Promise<Dish>;
 
-  fetchMatch(match: Match): Promise<Match>;
-  fetchScore(score: Score): Promise<Score>;
-  fetchTeam(team: Team): Promise<Team>;
+  saveRestaurant(args: {}): Promise<Restaurant>; //TODO CHECK ARGS
+  //(Suggestion) -> saveRestaurant(args: { namelocation }): Promise<Restaurant>; //CHECK ARGS TYPES
+  saveDish(args: {}): Promise<Dish>; //TODO CHECK ARGS
+  //(Suggestion) -> saveDish(args: { namepricerestaurantId }): Promise<Dish>; //CHECK ARGS TYPES
 
-  saveMatch(args: { date: Date, type: MType, visitorId: number, localId: number }): Promise<Match>;
-  saveScore(args: { min: number, matchId: number, playerId: number }): Promise<Score>;
+  setRestaurant(restaurantId: number, args: {}): Promise<Restaurant>; //TODO CHECK ARGS
+  //(Suggestion) -> setRestaurant(restaurantId: number, args: { namelocation? }): Promise<Restaurant>; //CHECK ARGS TYPES
+  setDish(dishId: number, args: {}): Promise<Dish>; //TODO CHECK ARGS
+  //(Suggestion) -> setDish(dishId: number, args: { namepricerestaurantId? }): Promise<Dish>; //CHECK ARGS TYPES
 
-  setMatch(matchId: number, args: { type?: MType }): Promise<Match>;
-  setPlayer(playerId: number, args: { teamId?: number }): Promise<Player>;
-
-  deleteMatch(matchId: number): Promise<void>;
+  deleteRestaurant(restaurantId: number): Promise<void>;
+  deleteDish(dishId: number): Promise<void>;
 }
 
 export default Sql;

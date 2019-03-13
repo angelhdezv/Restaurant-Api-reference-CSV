@@ -1,0 +1,5 @@
+TODOs (ANTES DEL GENERADOR)
+	- Crear Modelo ER
+	- Crear inserts con id = 1
+	- Exportar db
+	- Copiar código generado en assets/dev/sql.db

@@ -1,43 +1,19 @@
 import Sql from "@lt/sources/sql/Source";
-import Matches from "@lt/controllers/Matches";
-import Players from "@lt/controllers/Players";
-import Scores from "@lt/controllers/Scores";
-import Teams from "@lt/controllers/Teams";
-import Users from "@lt/controllers/Users";
+import Restaurants from "@lt/controllers/Restaurants";
+import Dishes from "@lt/controllers/Dishes";
 
 class Controllers
 {
-  static createMatches()
+  static createRestaurants()
   {
-    return new Matches({
+    return new Restaurants({
       sql: Sql.getInstance()
     });
   }
 
-  static createPlayers()
+  static createDishes()
   {
-    return new Players({
-      sql: Sql.getInstance()
-    });
-  }
-
-  static createScores()
-  {
-    return new Scores({
-      sql: Sql.getInstance()
-    });
-  }
-
-  static createTeams()
-  {
-    return new Teams({
-      sql: Sql.getInstance()
-    });
-  }
-
-  static createUsers()
-  {
-    return new Users({
+    return new Dishes({
       sql: Sql.getInstance()
     });
   }

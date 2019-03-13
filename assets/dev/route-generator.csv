@@ -1,13 +1,9 @@
-class,name,method,params
-Match,/matches,GET,team_id
-Match,/matches/:id,DELETE,
-Match,/matches/:id,PUT,type
-Match,/matches,POST,"date	type	visitor_id	local_id"
-Player,/players/top,GET,
-Player,/players,GET,team_id
-Player,/players/:id,PUT,team_id
-Score,/scores,POST,"min	match_id	player_id"
-Team,/teams/:id,GET,
-Team,/teams,GET,user_id
-User,/users/auth,GET,"email	password"
-User,/users/:id,GET,
+class,name,method,params,,,,,,,,,,,,,
+Restaurant,/restaurants/:id,GET,,,,,,,,,,,,,,
+Restaurant,/restaurants,POST,namelocation,,,,,,,,,,name,location,,
+Restaurant,/restaurants/:id,PUT,namelocation,,,,,,,,,,name,location,,
+Restaurant,/restaurants/:id,DELETE,,,,,,,,,,,,,,
+Dish,/dishes,GET,restaurant_id,,,,,,,,,,restaurant_id,,,
+Dish,/dishes,POST,namepricerestaurant_id,,,,,,,,,,name,price,restaurant_id,
+Dish,/dishes/:id,PUT,namepricerestaurant_id,,,,,,,,,,name,price,restaurant_id,
+Dish,/dishes/:id,DELETE,,,,,,,,,,,,,,

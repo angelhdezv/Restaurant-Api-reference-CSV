@@ -1,210 +1,128 @@
 import Repository from "@lt/sources/Sql";
 import { Pair } from "@util/Util";
-import Match from "@lt/models/Match";
-import Player from "@lt/models/Player";
-import Score from "@lt/models/Score";
-import Team from "@lt/models/Team";
-import User from "@lt/models/User";
+import Restaurant from "@lt/models/Restaurant";
+import Dish from "@lt/models/Dish";
 
 import Generator from "@util/Generator";
 import Executor from "@lt/sources/sql/Executor";
 import * as Mapper from "@lt/sources/sql/Mappers";
-import { MType } from "@lt/models/helpers/Const";
 
 class Source extends Executor implements Repository
 {
-  async getMatchList(fs: { teamId?: number }): Promise<Match[]> //CHECK ARGS TYPES
+  async getDishList(fs: {}): Promise<Dish[]>
+  //(Suggestion) -> async getDishList(fs: { restaurantId? }): Promise<Dish[]> //CHECK ARGS TYPES
   {
     const query =
-      `SELECT m.* FROM \`match\` m`;
+      `SELECT d.* FROM dish d`;
     const filter: Pair[] = [];
     //TODO ADD FILTERS
-    const res = await this.get(query, filter, new Mapper.MatchMapper());
-    return this.fetch(res, r => this.fetchMatch(r));
-  }
-
-  async getPlayerList(fs: { teamId?: number }): Promise<Player[]> //CHECK ARGS TYPES
-  {
-    const query =
-      `SELECT p.* FROM player p`;
-    const filter: Pair[] = [];
-    if (fs.teamId) filter.push(new Pair("p.team_id", fs.teamId));
-    const res = await this.get(query, filter, new Mapper.PlayerMapper());
-    return res;
-  }
-
-  async getTeamList(fs: { userId?: number }): Promise<Team[]> //CHECK ARGS TYPES
-  {
-    const query =
-      `SELECT t.* FROM team t
-       INNER JOIN user_team ut ON t.team_id = ut.team_id`;
-    const filter: Pair[] = [];
-    if (fs.userId) filter.push(new Pair("ut.user_id", fs.userId));
-    const res = await this.get(query, filter, new Mapper.TeamMapper());
-    return this.fetch(res, r => this.fetchTeam(r));
+    /* (Suggestion)
+    if (fs.restaurantId) filter.push(new Pair("d.restaurant_id", fs.restaurantId));
+    */
+    const res = await this.get(query, filter, new Mapper.DishMapper());
+    //TODO CHECK FETCH
+    return res; 
   }
 
 
 
-  async getMatchDetails(matchId: number): Promise<Match>
+  async getRestaurantDetails(restaurantId: number): Promise<Restaurant>
   {
     const query =
-      `SELECT m.* FROM \`match\` m WHERE m.match_id = ?`;
-    const params = [matchId];
-    const res = await this.getDetails(query, params, new Mapper.MatchMapper());
-    const fetch = await this.fetch(res, r => this.fetchMatch(r));
-    return fetch[0];
-  }
-
-  async getPlayerDetails(playerId: number): Promise<Player>
-  {
-    const query =
-      `SELECT p.* FROM player p WHERE p.player_id = ?`;
-    const params = [playerId];
-    const res = await this.getDetails(query, params, new Mapper.PlayerMapper());
+      `SELECT r.* FROM restaurant r WHERE r.restaurant_id = ?`;
+    const params = [restaurantId];
+    const res = await this.getDetails(query, params, new Mapper.RestaurantMapper());
+    //TODO CHECK FETCH
     return res[0];
   }
 
-  async getScoreDetails(scoreId: number): Promise<Score>
+  async getDishDetails(dishId: number): Promise<Dish>
   {
     const query =
-      `SELECT s.* FROM score s WHERE s.score_id = ?`;
-    const params = [scoreId];
-    const res = await this.getDetails(query, params, new Mapper.ScoreMapper());
-    const fetch = await this.fetch(res, r => this.fetchScore(r));
-    return fetch[0];
+      `SELECT d.* FROM dish d WHERE d.dish_id = ?`;
+    const params = [dishId];
+    const res = await this.getDetails(query, params, new Mapper.DishMapper());
+    //TODO CHECK FETCH
+    return res[0];
   }
 
-  async getTeamDetails(teamId: number): Promise<Team>
+
+
+  async saveRestaurant(args: {}): Promise<Restaurant>
+  //(Suggestion) -> async saveRestaurant(args: { namelocation }): Promise<Restaurant> //CHECK ARGS TYPES
   {
-    const query =
-      `SELECT t.* FROM team t WHERE t.team_id = ?`;
-    const params = [teamId];
-    const res = await this.getDetails(query, params, new Mapper.TeamMapper());
-    const fetch = await this.fetch(res, r => this.fetchTeam(r));
-    return fetch[0];
+    const restaurantId = Generator.getId();
+    const query = "INSERT INTO restaurant";
+    const attrs: Pair[] = [];
+    attrs.push(new Pair("restaurant_id", restaurantId));
+    //TODO ADD COLUMNS
+    /* (Suggestion)
+    attrs.push(new Pair("namelocation", args.namelocation));
+    */
+    await this.save(query, attrs);
+    return this.getRestaurantDetails(restaurantId);
   }
 
-  async getUserAuth(email: string, password: string): Promise<User>
+  async saveDish(args: {}): Promise<Dish>
+  //(Suggestion) -> async saveDish(args: { namepricerestaurantId }): Promise<Dish> //CHECK ARGS TYPES
+  {
+    const dishId = Generator.getId();
+    const query = "INSERT INTO dish";
+    const attrs: Pair[] = [];
+    attrs.push(new Pair("dish_id", dishId));
+    //TODO ADD COLUMNS
+    /* (Suggestion)
+    attrs.push(new Pair("namepricerestaurant_id", args.namepricerestaurantId));
+    */
+    await this.save(query, attrs);
+    return this.getDishDetails(dishId);
+  }
+
+
+
+  async setRestaurant(restaurantId: number, args: {}): Promise<Restaurant>
+  //(Suggestion) -> async setRestaurant(restaurantId: number, args: { namelocation? }): Promise<Restaurant> //CHECK ARGS TYPES
+  {
+    const query = "UPDATE restaurant";
+    const columns: Pair[] = [];
+    //TODO ADD COLUMNS
+    /* (Suggestion)
+    if (args.namelocation) columns.push(new Pair("namelocation", args.namelocation));
+    */
+    await this.set(query, columns, "restaurant_id", restaurantId);
+    return this.getRestaurantDetails(restaurantId);
+  }
+
+  async setDish(dishId: number, args: {}): Promise<Dish>
+  //(Suggestion) -> async setDish(dishId: number, args: { namepricerestaurantId? }): Promise<Dish> //CHECK ARGS TYPES
+  {
+    const query = "UPDATE dish";
+    const columns: Pair[] = [];
+    //TODO ADD COLUMNS
+    /* (Suggestion)
+    if (args.namepricerestaurantId) columns.push(new Pair("namepricerestaurant_id", args.namepricerestaurantId));
+    */
+    await this.set(query, columns, "dish_id", dishId);
+    return this.getDishDetails(dishId);
+  }
+
+
+
+  async deleteRestaurant(restaurantId: number): Promise<void>
   {
     const query = `
-      SELECT u.* FROM user u 
-      WHERE u.email = ? AND u.password = ?`;
-    const params = [email, password];
-    const res = await this.getDetails(query, params, new Mapper.UserMapper());
-    return res[0];
+      DELETE FROM restaurant WHERE restaurant_id = ?;`
+    //TODO CHECK EXTRA DELETES
+    const params = [restaurantId];
+    return this.delete(query, params);
   }
 
-  async getUserDetails(userId: number): Promise<User>
+  async deleteDish(dishId: number): Promise<void>
   {
-    const query =
-      `SELECT u.* FROM user u WHERE u.user_id = ?`;
-    const params = [userId];
-    const res = await this.getDetails(query, params, new Mapper.UserMapper());
-    return res[0];
-  }
-
-
-  async fetchMatch(match: Match): Promise<Match>
-  {
-    const sQuery = "SELECT score_id FROM score WHERE match_id = ?";
-    const sKeys = await this.getAny(sQuery, [match.id]);
-
-    const visitor = await this.getTeamDetails(match.visitor.id);
-    const local = await this.getTeamDetails(match.local.id);
-    const scores = [];
-    for (let key of sKeys)
-      scores.push(await this.getScoreDetails(key.score_id));
-
-    return Object.assign(match,
-      {
-        visitor: visitor,
-        local: local,
-        scores: scores
-      });
-  }
-
-  async fetchScore(score: Score): Promise<Score>
-  {
-    const player = await this.getPlayerDetails(score.player.id);
-    return Object.assign(score,
-      {
-        player: player
-      });
-  }
-
-  async fetchTeam(team: Team): Promise<Team>
-  {
-    const pQuery = "SELECT player_id FROM player WHERE team_id = ?";
-    const pKeys = await this.getAny(pQuery, [team.id]);
-
-    const players = [];
-    for (let key of pKeys)
-      players.push(await this.getPlayerDetails(key.player_id));
-
-    return Object.assign(team,
-      {
-        players: players
-      });
-  }
-
-
-
-  async saveMatch(args: { date: Date, type: MType, visitorId: number, localId: number }): Promise<Match> //CHECK ARGS TYPES
-  {
-    const matchId = Generator.getId();
-    const query = "INSERT INTO \`match\`";
-    const attrs: Pair[] = [];
-    attrs.push(new Pair("match_id", matchId));
-    attrs.push(new Pair("date", args.date));
-    attrs.push(new Pair("type", args.type));
-    attrs.push(new Pair("visitor_id", args.visitorId));
-    attrs.push(new Pair("local_id", args.localId));
-    await this.save(query, attrs);
-    return this.getMatchDetails(matchId);
-  }
-
-  async saveScore(args: { min: number, matchId: number, playerId: number }): Promise<Score> //CHECK ARGS TYPES
-  {
-    const scoreId = Generator.getId();
-    const query = "INSERT INTO score";
-    const attrs: Pair[] = [];
-    attrs.push(new Pair("score_id", scoreId));
-    attrs.push(new Pair("min", args.min));
-    attrs.push(new Pair("match_id", args.matchId));
-    attrs.push(new Pair("player_id", args.playerId));
-    await this.save(query, attrs);
-    return this.getScoreDetails(scoreId);
-  }
-
-
-
-  async setMatch(matchId: number, args: { type?: MType }): Promise<Match> //CHECK ARGS TYPES
-  {
-    const query = "UPDATE \`match\`";
-    const columns: Pair[] = [];
-    if (args.type) columns.push(new Pair("type", args.type));
-    await this.set(query, columns, "match_id", matchId);
-    return this.getMatchDetails(matchId);
-  }
-
-  async setPlayer(playerId: number, args: { teamId?: number }): Promise<Player> //CHECK ARGS TYPES
-  {
-    const query = "UPDATE player";
-    const columns: Pair[] = [];
-    if (args.teamId) columns.push(new Pair("team_id", args.teamId));
-    await this.set(query, columns, "player_id", playerId);
-    return this.getPlayerDetails(playerId);
-  }
-
-
-
-  async deleteMatch(matchId: number): Promise<void>
-  {
-    const query = ` 
-      DELETE FROM score WHERE match_id = ?;
-      DELETE FROM \`match\` WHERE match_id = ?;`;
-    const params = [matchId, matchId];
+    const query = `
+      DELETE FROM dish WHERE dish_id = ?;`
+    //TODO CHECK EXTRA DELETES
+    const params = [dishId];
     return this.delete(query, params);
   }
 
